@@ -30,7 +30,7 @@ public class Locators {
     public static SelenideElement FINAL_LIST = $("div#checkout_summary_container");
     public static SelenideElement CART_ITEMS_NUMBER = $("span.shopping_cart_badge");
 
-public static SelenideElement ITEM_DESCRIPTION = $("div.inventory_item_description");
+
 
 
 
@@ -47,11 +47,6 @@ public static SelenideElement ITEM_DESCRIPTION = $("div.inventory_item_descripti
     public static SelenideElement TAX = $("div.summary_tax_label");
     public static SelenideElement TOTAL = $("div.summary_total_label");
 
-    public static SelenideElement MENU_BUTTON = $("button#react-burger-menu-btn");
-    public static SelenideElement ALL_ITEMS = $ ("a#inventory_sidebar_link");
-
-
-    public static SelenideElement BACK_HOME = $("button#back-to-products");
     public static SelenideElement FINAL_NOTICE =$("h2.complete-header");
 
 }
