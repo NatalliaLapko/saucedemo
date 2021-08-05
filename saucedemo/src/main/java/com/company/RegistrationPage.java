@@ -1,9 +1,5 @@
 package com.company;
 
-import com.codeborne.selenide.ElementsCollection;
-import org.openqa.selenium.By;
-
-
 
 public class RegistrationPage extends Locators {
 
@@ -47,26 +43,6 @@ public class RegistrationPage extends Locators {
     public double totalSumCalculation() {
         double expectedTotalSum = getTotalItem() + getTax();
         return expectedTotalSum;
-    }
-
-
-
-    public double allItemsSum() {
-        ElementsCollection cartItemsCollection = CartPage.CART_LIST.$$(By.cssSelector("div.cart_item_label"));
-        int colSize = cartItemsCollection.size();
-        System.out.println(colSize);
-        double totalSum = 0;
-        double itemPrice = 0;
-        for (int i = 0; i < colSize; i++) {
-            String temp = cartItemsCollection.get(i).$(By.cssSelector("div.inventory_item_price")).getText();
-            temp = temp.substring(1);
-            itemPrice = Double.parseDouble(temp);
-
-        }
-
-        return totalSum;
-
-
     }
 
 
