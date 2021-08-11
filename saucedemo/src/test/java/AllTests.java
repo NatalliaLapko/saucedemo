@@ -1,15 +1,8 @@
 
-
-import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.WebDriverRunner.url;
-
 import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.Selenide;
-
 import com.company.*;
-
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 
@@ -19,86 +12,76 @@ import java.io.IOException;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AllTests {
 
-    @BeforeEach
-    public void setUp() {
-        Configuration.startMaximized = true;
+    LoginPage loginPage = new LoginPage();
+    CartPage cartPage = new CartPage();
+    RegistrationPage registrationPage = new RegistrationPage();
+    FinalPage finalPage = new FinalPage();
 
+
+    @BeforeEach
+    @DisplayName("LogIn")
+
+    public void login() throws IOException {
+
+        loginPage.openLoginPage();
+        loginPage.login();
+        Assertions.assertEquals(Links.loginPage, url(), "Wrong page!");
     }
 
     @AfterEach
-    public void tearDown() {
-        closeWebDriver();
-    }
-
-    @Test
-    @DisplayName("LogIn")
-    @Order(1)
-    public void login() throws IOException {
-        LoginPage loginPage = new LoginPage();
-        loginPage.openLoginPage();
-        loginPage.login();
-
-        Assertions.assertEquals("https://www.saucedemo.com/inventory.html", url(), "Wrong page!");
+    @DisplayName("LogOut")
+    public void logout(){
+        loginPage.logout();
     }
 
     @Test
     @DisplayName("Ordering")
-    @Order(3)
+    @Order(2)
     public void purchase() throws IOException {
-        LoginPage loginPage = new LoginPage();
-        CartPage cartPage = new CartPage();
-        RegistrationPage registrationPage = new RegistrationPage();
-        loginPage.openLoginPage();
-        loginPage.login();
-        CartPage.addToCart();
+
+        cartPage.addToCart();
         cartPage.goToCart();
         cartPage.purchase();
+        registrationPage.setFirstName("Test");
+        registrationPage.setLastnameName("User");
+        registrationPage.setZipCode("123456");
         registrationPage.registration();
         registrationPage.finish();
-        FinalPage finalPage = new FinalPage();
         finalPage.currentURL();
         String notice = finalPage.getFinalNotice();
-        Selenide.sleep(4000);
 
-
-        Assertions.assertEquals("https://www.saucedemo.com/checkout-complete.html", url(), "Wrong page!");
+        Assertions.assertEquals(Links.checkoutComplete, url(), "Wrong page!");
         Assertions.assertEquals("THANK YOU FOR YOUR ORDER", notice, "Wrong message!");
 
     }
 
     @Test
     @DisplayName("Order cancellation")
-    @Order(2)
-    public void orderCancellation() throws IOException {
-        LoginPage loginPage = new LoginPage();
-        CartPage cartPage = new CartPage();
-        RegistrationPage registrationPage = new RegistrationPage();
-        loginPage.openLoginPage();
-        loginPage.login();
-        cartPage.addToCart();
+    @Order(3)
+    public void orderCancellation()  {
+
+
         cartPage.goToCart();
         cartPage.purchase();
+        registrationPage.setFirstName("Default");
+        registrationPage.setLastnameName("User");
+        registrationPage.setZipCode("111111");
         registrationPage.registration();
         registrationPage.cancel();
-        Selenide.sleep(2000);
 
-        Assertions.assertEquals("https://www.saucedemo.com/inventory.html", url());
+
+        Assertions.assertEquals(Links.inventory, url());
 
     }
 
 
     @Test
 @DisplayName("Items Removing")
-    @Order(4)
+    @Order(1)
     public void removeItemsFromCart() throws IOException {
-        LoginPage loginPage = new LoginPage();
-        CartPage cartPage = new CartPage();
-        loginPage.openLoginPage();
-        loginPage.login();
+
         cartPage.addToCart();
         cartPage.goToCart();
-        Selenide.sleep(2000);
-        CartPage.CART_LIST.shouldBe(Condition.visible);
         ElementsCollection cartItemsCollection = CartPage.CART_LIST.$$(By.cssSelector("div.cart_item"));
         int colSize = cartItemsCollection.size();
 
@@ -108,7 +91,7 @@ public class AllTests {
 
         colSize = cartItemsCollection.size();
 
-       Assertions.assertTrue(colSize == 0);
+       Assertions.assertEquals( 0, colSize);
 
 
 
@@ -116,45 +99,41 @@ public class AllTests {
     }
 
 
-
     @Test
     @DisplayName("Total Sum Calculation")
-    @Order(5)
+    @Order(4)
     public void totalItems() throws IOException {
-        LoginPage loginPage = new LoginPage();
-        CartPage cartPage = new CartPage();
-        RegistrationPage registrationPage = new RegistrationPage();
-        loginPage.openLoginPage();
-        loginPage.login();
+
         cartPage.addToCart();
         cartPage.goToCart();
         cartPage.purchase();
+        registrationPage.setFirstName("User");
+        registrationPage.setLastnameName("Test");
+        registrationPage.setZipCode("5415549");
         registrationPage.registration();
-        Selenide.sleep(2000);
-        CartPage.FINAL_LIST.shouldBe(Condition.visible);
         ElementsCollection cartItemsCollection = CartPage.FINAL_LIST.$$(By.cssSelector("div.cart_item_label"));
         int colSize = cartItemsCollection.size();
-        //System.out.println(colSize);
-        double totalItem = 0;
+
+        double totalItemSum = 0;
         double itemPrice = 0;
         for (int i = 0; i < colSize; i++) {
             String temp = cartItemsCollection.get(i).$(By.cssSelector("div.inventory_item_price")).getText();
             temp = temp.substring(1);
             itemPrice = Double.parseDouble(temp);
-            totalItem = totalItem + itemPrice;
+            totalItemSum += itemPrice;
 
         }
 
-        double totalSum =  totalItem + registrationPage.getTax();
-        Selenide.sleep(2000);
+        double expectedSum =  totalItemSum + registrationPage.getTax();
 
-         System.out.println("Total Item = " + totalItem);
+
+         System.out.println("Total Item = " + totalItemSum);
          System.out.println("Tax = " + registrationPage.getTax());
-         System.out.println("Total Sum = " + totalSum);
-         System.out.println("RealSum = " + registrationPage.getTotalSum() + "\n" + "ExpectedSum = " + totalSum);
+         System.out.println("Total Sum = " + expectedSum);
+         System.out.println("RealSum = " + registrationPage.getTotalSum() + "\n" + "ExpectedSum = " + expectedSum);
 
-        Assertions.assertTrue(totalItem == registrationPage.getTotalItem());
-        Assertions.assertTrue(totalSum == registrationPage.getTotalSum());
+        Assertions.assertEquals(registrationPage.getTotalItem(), totalItemSum);
+        Assertions.assertEquals(registrationPage.getTotalSum(), expectedSum);
 
 
 
