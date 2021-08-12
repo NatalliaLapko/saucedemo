@@ -21,7 +21,7 @@ public class AllTests {
     @BeforeEach
     @DisplayName("LogIn")
 
-    public void login() throws IOException {
+    public void loginTest() throws IOException {
 
         loginPage.openLoginPage();
         loginPage.login();
@@ -30,14 +30,14 @@ public class AllTests {
 
     @AfterEach
     @DisplayName("LogOut")
-    public void logout(){
+    public void logoutTest(){
         loginPage.logout();
     }
 
     @Test
     @DisplayName("Ordering")
     @Order(2)
-    public void purchase() throws IOException {
+    public void purchaseTest() throws IOException {
 
         cartPage.addToCart();
         cartPage.goToCart();
@@ -58,7 +58,7 @@ public class AllTests {
     @Test
     @DisplayName("Order cancellation")
     @Order(3)
-    public void orderCancellation()  {
+    public void orderCancellationTest()  {
 
 
         cartPage.goToCart();
@@ -78,7 +78,7 @@ public class AllTests {
     @Test
 @DisplayName("Items Removing")
     @Order(1)
-    public void removeItemsFromCart() throws IOException {
+    public void removeItemsFromCartTest() throws IOException {
 
         cartPage.addToCart();
         cartPage.goToCart();
@@ -102,7 +102,7 @@ public class AllTests {
     @Test
     @DisplayName("Total Sum Calculation")
     @Order(4)
-    public void totalItems() throws IOException {
+    public void totalItemsTest() throws IOException {
 
         cartPage.addToCart();
         cartPage.goToCart();
